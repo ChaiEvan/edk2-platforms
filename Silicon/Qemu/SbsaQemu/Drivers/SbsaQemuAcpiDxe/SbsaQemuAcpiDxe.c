@@ -1,7 +1,7 @@
 /** @file
 *  This file is an ACPI driver for the Qemu SBSA platform.
 *
-*  Copyright (c) 2020, Linaro Ltd. All rights reserved.
+*  Copyright (c) 2020-2024, Linaro Ltd. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -15,10 +15,10 @@
 #include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/FdtHelperLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
+#include <Library/HardwareInfoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
@@ -255,8 +255,7 @@ AddMadtTable (
  // Initialize GIC Redistributor Structure
   EFI_ACPI_6_0_GICR_STRUCTURE Gicr = SBSAQEMU_MADT_GICR_INIT();
 
-  // Get CoreCount which was determined eariler after parsing device tree
-  NumCores = PcdGet32 (PcdCoreCount);
+  NumCores = GetCpuCount ();
 
   // Calculate the new table size based on the number of cores
   TableSize = sizeof (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER) +
@@ -291,13 +290,13 @@ AddMadtTable (
   New += sizeof (EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);
 
   // Add new GICC structures for the Cores
-  for (CoreIndex = 0; CoreIndex < PcdGet32 (PcdCoreCount); CoreIndex++) {
+  for (CoreIndex = 0; CoreIndex < NumCores; CoreIndex++) {
     EFI_ACPI_6_0_GIC_STRUCTURE *GiccPtr;
 
     CopyMem (New, &Gicc, sizeof (EFI_ACPI_6_0_GIC_STRUCTURE));
     GiccPtr = (EFI_ACPI_6_0_GIC_STRUCTURE *) New;
     GiccPtr->AcpiProcessorUid = CoreIndex;
-    GiccPtr->MPIDR = FdtHelperGetMpidr (CoreIndex);
+    GiccPtr->MPIDR = GetMpidr (CoreIndex);
     New += sizeof (EFI_ACPI_6_0_GIC_STRUCTURE);
   }
 
@@ -396,7 +395,7 @@ AddSsdtTable (
   UINT32                CpuId;
   UINT32                Offset;
   UINT8                 ScopeOpName[] =  SBSAQEMU_ACPI_SCOPE_NAME;
-  UINT32                NumCores = PcdGet32 (PcdCoreCount);
+  UINT32                NumCores = GetCpuCount ();
 
   EFI_ACPI_DESCRIPTION_HEADER Header =
     SBSAQEMU_ACPI_HEADER (
@@ -497,7 +496,7 @@ AddPpttTable (
   EFI_PHYSICAL_ADDRESS  PageAddress;
   UINT8                 *New;
   UINT32                CpuId;
-  UINT32                NumCores = PcdGet32 (PcdCoreCount);
+  UINT32                NumCores = GetCpuCount ();
 
   EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE L1DCache = SBSAQEMU_ACPI_PPTT_L1_D_CACHE_STRUCT;
   EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE L1ICache = SBSAQEMU_ACPI_PPTT_L1_I_CACHE_STRUCT;
@@ -684,6 +683,91 @@ AddGtdtTable (
 }
 
 /*
+ * A function that adds the SRAT ACPI table.
+ */
+EFI_STATUS
+AddSratTable (
+  IN EFI_ACPI_TABLE_PROTOCOL   *AcpiTable
+  )
+{
+  EFI_STATUS            Status;
+  UINT8                 *New;
+  EFI_PHYSICAL_ADDRESS  PageAddress;
+  UINTN                 TableHandle;
+  UINT32                TableSize;
+  UINT32                Index;
+  UINT32                NodeId;
+  UINT32                NumMemNodes;
+  MemoryInfo            MemInfo;
+  UINT32                NumCores = GetCpuCount ();
+
+  // Initialize SRAT ACPI Header
+  EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER Header = {
+     SBSAQEMU_ACPI_HEADER (EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,
+                           EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER,
+                           EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION),
+      1, 0 };
+
+  NumMemNodes  = GetMemNodeCount();
+
+  // Calculate the new table size based on the number of cores
+  TableSize = sizeof (EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER) +
+               (sizeof (EFI_ACPI_6_4_MEMORY_AFFINITY_STRUCTURE) * NumMemNodes ) +
+               (sizeof (EFI_ACPI_6_4_GICC_AFFINITY_STRUCTURE) * NumCores);
+
+  Status = gBS->AllocatePages (
+                AllocateAnyPages,
+                EfiACPIReclaimMemory,
+                EFI_SIZE_TO_PAGES (TableSize),
+                &PageAddress
+                );
+
+  if (EFI_ERROR(Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to allocate pages for SRAT table\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  New = (UINT8 *)(UINTN) PageAddress;
+  ZeroMem (New, TableSize);
+
+  // Add the ACPI Description table header
+  CopyMem (New, &Header, sizeof (EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER));
+  ((EFI_ACPI_DESCRIPTION_HEADER*) New)->Length = TableSize;
+  New += sizeof (EFI_ACPI_6_4_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER);
+
+  // Add memory structures
+  for (Index = 0; Index < NumMemNodes ; Index++) {
+    GetMemInfo (Index, &MemInfo);
+    EFI_ACPI_6_4_MEMORY_AFFINITY_STRUCTURE memory = SBSAQEMU_ACPI_MEMORY_AFFINITY_STRUCTURE_INIT (MemInfo.NodeId, MemInfo.AddressBase, MemInfo.AddressSize, 1);
+    CopyMem (New, &memory, sizeof (EFI_ACPI_6_4_MEMORY_AFFINITY_STRUCTURE));
+    New += sizeof (EFI_ACPI_6_4_MEMORY_AFFINITY_STRUCTURE);
+  }
+
+  // Add processor structures for the cores
+  for (Index = 0; Index < NumCores; Index++) {
+    NodeId = GetCpuNumaNode(Index);
+    EFI_ACPI_6_4_GICC_AFFINITY_STRUCTURE gicc = SBSAQEMU_ACPI_GICC_AFFINITY_STRUCTURE_INIT(NodeId, Index, 1, 0);
+    CopyMem (New, &gicc, sizeof (EFI_ACPI_6_4_GICC_AFFINITY_STRUCTURE));
+    New += sizeof (EFI_ACPI_6_4_GICC_AFFINITY_STRUCTURE);
+  }
+
+  // Perform Checksum
+  AcpiPlatformChecksum ((UINT8*) PageAddress, TableSize);
+
+  Status = AcpiTable->InstallAcpiTable (
+                        AcpiTable,
+                        (EFI_ACPI_COMMON_HEADER *)PageAddress,
+                        TableSize,
+                        &TableHandle
+                        );
+  if (EFI_ERROR(Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to install SRAT table\n"));
+  }
+
+  return Status;
+}
+
+/*
  * A function to disable XHCI node on Platform Version lower than 0.3
  */
 STATIC
@@ -758,12 +842,6 @@ InitializeSbsaQemuAcpiDxe (
 {
   EFI_STATUS                     Status;
   EFI_ACPI_TABLE_PROTOCOL        *AcpiTable;
-  UINT32                         NumCores;
-
-  // Parse the device tree and get the number of CPUs
-  NumCores = FdtHelperCountCpus ();
-  Status = PcdSet32S (PcdCoreCount, NumCores);
-  ASSERT_RETURN_ERROR (Status);
 
   // Check if ACPI Table Protocol has been installed
   Status = gBS->LocateProtocol (
@@ -798,6 +876,13 @@ InitializeSbsaQemuAcpiDxe (
   Status = AddPpttTable (AcpiTable);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to add PPTT table\n"));
+  }
+
+  if (GetNumaNodeCount() > 1){
+    Status = AddSratTable (AcpiTable);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failed to add SRAT table\n"));
+    }
   }
 
   Status = AddGtdtTable (AcpiTable);

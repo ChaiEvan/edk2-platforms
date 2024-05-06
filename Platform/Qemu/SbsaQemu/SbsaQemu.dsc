@@ -1,6 +1,6 @@
 #
 #  Copyright (c) 2021, NUVIA Inc. All rights reserved.
-#  Copyright (c) 2019, Linaro Limited. All rights reserved.
+#  Copyright (c) 2019-2024, Linaro Ltd. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -80,7 +80,6 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
@@ -126,8 +125,8 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   # ARM PL011 UART Driver
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 
-  FdtHelperLib|Silicon/Qemu/SbsaQemu/Library/FdtHelperLib/FdtHelperLib.inf
   OemMiscLib|Platform/Qemu/SbsaQemu/OemMiscLib/OemMiscLib.inf
+  HardwareInfoLib|Silicon/Qemu/SbsaQemu/Library/SbsaQemuHardwareInfoLib/SbsaQemuHardwareInfoLib.inf
 
   # Debug Support
   PeCoffExtraActionLib|ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
@@ -429,9 +428,6 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
-  # Initial Device Tree Location
-  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdDeviceTreeBaseAddress|0x10000000000
-
   # Non discoverable devices (AHCI,XHCI)
   gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformAhciBase|0x60100000
   gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformAhciSize|0x00010000
@@ -440,16 +436,6 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
 
   # PL011 - Serial Terminal
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60000000
-
-  # Timer IRQs
-  # PPI #13
-  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29
-  # PPI #14
-  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30
-  # PPI #11
-  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27
-  # PPI #10
-  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x60010000
@@ -675,6 +661,7 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  Silicon/Qemu/SbsaQemu/Drivers/SbsaQemuHighMemDxe/SbsaQemuHighMemDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
@@ -730,7 +717,6 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   #
   ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
   ArmPkg/Universal/Smbios/SmbiosMiscDxe/SmbiosMiscDxe.inf
-  EmbeddedPkg/Library/FdtLib/FdtLib.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   Silicon/Qemu/SbsaQemu/Drivers/SbsaQemuSmbiosDxe/SbsaQemuSmbiosDxe.inf
 
