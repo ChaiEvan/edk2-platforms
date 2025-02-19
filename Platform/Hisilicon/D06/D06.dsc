@@ -103,7 +103,6 @@
   #  It could be set FALSE to save size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gHisiTokenSpaceGuid.PcdIsItsSupported|TRUE
-  gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
 [PcdsDynamicExDefault.common.DEFAULT]
   gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor|{0x0}|VOID*|0x100
@@ -117,7 +116,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
 
 
-  # Stacks for MPCores in Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0xA0E88000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x40000
 
@@ -231,7 +229,7 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 
@@ -296,7 +294,7 @@
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
 
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 

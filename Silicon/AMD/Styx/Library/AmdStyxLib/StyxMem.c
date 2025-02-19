@@ -19,8 +19,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
 
-#if !defined(MDEPKG_NDEBUG)
-
 static const char *tblAttrDesc[] =
 {
   "UNCACHED_UNBUFFERED          ",
@@ -32,9 +30,8 @@ static const char *tblAttrDesc[] =
   "DEVICE                       ",
   "NONSECURE_DEVICE             "
 };
-#endif
 
-#define LOG_MEM(desc) DEBUG ((EFI_D_ERROR, desc, VirtualMemoryTable[Index].PhysicalBase, \
+#define LOG_MEM(desc) DEBUG ((DEBUG_ERROR, desc, VirtualMemoryTable[Index].PhysicalBase, \
                             ( VirtualMemoryTable[Index].PhysicalBase+VirtualMemoryTable[Index].Length - 1), \
                              VirtualMemoryTable[Index].Length, tblAttrDesc[VirtualMemoryTable[Index].Attributes]));
 
@@ -74,8 +71,8 @@ ArmPlatformGetVirtualMemoryMap (
 
   CacheAttributes = DDR_ATTRIBUTES_CACHED;
 
-  DEBUG ((EFI_D_ERROR, " Memory Map\n------------------------------------------------------------------------\n"));
-  DEBUG ((EFI_D_ERROR, "Description                    :        START       -        END         [        SIZE        ]    {              ATTR             }\n"));
+  DEBUG ((DEBUG_ERROR, " Memory Map\n------------------------------------------------------------------------\n"));
+  DEBUG ((DEBUG_ERROR, "Description                    :        START       -        END         [        SIZE        ]    {              ATTR             }\n"));
 
   // 0xE000_0000 - 0xEFFF_FFFF: Mapped I/O space
   VirtualMemoryTable[Index].PhysicalBase   = 0xE0000000UL;

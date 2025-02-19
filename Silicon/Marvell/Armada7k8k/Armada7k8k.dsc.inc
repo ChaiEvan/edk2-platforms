@@ -81,11 +81,7 @@
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
-  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DmaLib|EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
-  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
-  ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
-  ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -97,7 +93,8 @@
   # Reset and Time libraries
   TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
   RealTimeClockLib|Silicon/Marvell/Armada7k8k/Library/RealTimeClockLib/RealTimeClockLib.inf
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
+  ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
 
   # These libraries are used by the dynamic EFI Shell commands
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
@@ -136,11 +133,9 @@
 
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-  LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
-  ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEIM]
@@ -201,17 +196,6 @@
   DebugLib|MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
-  #
-  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
-  # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
@@ -222,10 +206,6 @@
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  # Use the Vector Table location in CpuDxe.
-  # We will not copy the Vector Table at PcdCpuVectorBaseAddress
-  gArmTokenSpaceGuid.PcdRelocateVectorTable|FALSE
-
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
   # If TRUE, Graphics Output Protocol will be installed on virtual
@@ -281,7 +261,6 @@
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0xF022F000
 
   # ARM Architectural Timer Support
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|25000000
   gEmbeddedTokenSpaceGuid.PcdMetronomeTickPeriod|1000
 
   # ARM SBSA Watchdog
@@ -418,7 +397,7 @@
 [Components.common]
 
   # PEI Phase modules
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
     <LibraryClasses>
@@ -449,7 +428,7 @@
 
   # Architectural Protocols DXE
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 

@@ -40,8 +40,8 @@
 
   DT_SUPPORT                     = FALSE
 
-!include Platform/ARM/VExpressPkg/ArmVExpress.dsc.inc
 !include MdePkg/MdeLibs.dsc.inc
+!include Platform/ARM/VExpressPkg/ArmVExpress.dsc.inc
 !include DynamicTablesPkg/DynamicTables.dsc.inc
 
 [LibraryClasses.common]
@@ -69,6 +69,7 @@
   DtPlatformDtbLoaderLib|Platform/ARM/VExpressPkg/Library/ArmVExpressDtPlatformDtbLoaderLib/ArmVExpressDtPlatformDtbLoaderLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
   ArmPlatformSysConfigLib|Platform/ARM/VExpressPkg/Library/ArmVExpressSysConfigRuntimeLib/ArmVExpressSysConfigRuntimeLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_DRIVER]
@@ -132,11 +133,9 @@
 
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 
-  # Stacks for MPCores in Normal World
   # Non-Trusted SRAM
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x2E000000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x0
 
   # System Memory
   # When RME is supported by the FVP the top 64MB of DRAM1 (i.e. at the top
@@ -230,13 +229,14 @@
   #
 !ifdef EDK2_SKIP_PEICORE
   # UEFI is placed in RAM by bootloader
-  ArmPlatformPkg/PrePi/PeiUniCore.inf {
+  ArmPlatformPkg/PeilessSec/PeilessSec.inf {
     <LibraryClasses>
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       ArmPlatformLib|Platform/ARM/VExpressPkg/Library/ArmVExpressLibRTSM/ArmVExpressLib.inf
   }
 !else
   # UEFI lives in FLASH and copies itself to RAM
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>
@@ -322,7 +322,7 @@
       gArmPlatformTokenSpaceGuid.PL011UartInterrupt|0x25
   }
 
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   Platform/ARM/Drivers/NorFlashDxe/NorFlashDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 !ifdef EDK2_ENABLE_PL111

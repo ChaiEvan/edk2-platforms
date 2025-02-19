@@ -97,6 +97,7 @@
   TestPointCheckLib|MinPlatformPkg/Test/Library/TestPointCheckLib/PeiTestPointCheckLib.inf
   TestPointLib|MinPlatformPkg/Test/Library/TestPointLib/PeiTestPointLib.inf
   SetCacheMtrrLib|MinPlatformPkg/Library/SetCacheMtrrLib/SetCacheMtrrLibNull.inf
+  MmUnblockMemoryLib|UefiCpuPkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   #
@@ -168,6 +169,7 @@
 
   MinPlatformPkg/PlatformInit/ReportFv/ReportFvPei.inf
   MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPreMem.inf
+  MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPreMemNonFsp.inf
   MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPostMem.inf
   MinPlatformPkg/PlatformInit/PlatformInitDxe/PlatformInitDxe.inf
   MinPlatformPkg/PlatformInit/PlatformInitSmm/PlatformInitSmm.inf

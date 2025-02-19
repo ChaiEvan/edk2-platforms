@@ -75,10 +75,8 @@
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 
-  # Stacks for MPCores in Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x80000000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x40000
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x0
 
   # System Memory (2GB - 16MB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x80000000
@@ -147,7 +145,7 @@
   # PEI Phase modules
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
@@ -170,7 +168,7 @@
 
   # Architectural Protocols
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf

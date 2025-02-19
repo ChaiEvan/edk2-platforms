@@ -11,11 +11,15 @@
 #
 ################################################################################
 [Defines]
+!if $(ENABLE_RME)
+  PLATFORM_NAME                  = SbsaQemuRme
+!else
   PLATFORM_NAME                  = SbsaQemu
+!endif
   PLATFORM_GUID                  = feb0325c-b93d-4e47-8844-b832adeb9e0c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/SbsaQemu
+  OUTPUT_DIRECTORY               = Build/$(PLATFORM_NAME)
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
@@ -95,29 +99,18 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   # use the accelerated BaseMemoryLibOptDxe by default, overrides for SEC/PEI below
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
 
-  #
-  # It is not possible to prevent the ARM compiler from inserting calls to intrinsic functions.
-  # This library provides the instrinsic functions such a compiler may generate calls to.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
   # ARM Architectural Libraries
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
-  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
-  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
-  ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerVirtCounterLib/ArmGenericTimerVirtCounterLib.inf
 
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
+  ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
 
   # ARM PL031 RTC Driver
   RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
@@ -294,9 +287,6 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
 [PcdsFeatureFlag.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
 
-  # Use the Vector Table location in CpuDxe. We will not copy the Vector Table at PcdCpuVectorBaseAddress
-  gArmTokenSpaceGuid.PcdRelocateVectorTable|FALSE
-
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
@@ -400,10 +390,18 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 
   # System Memory Base -- fixed
-  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x10000000000
+  !if $(ENABLE_RME)
+    #
+    # When RME is enabled the RMM is installed at 0x10000000000
+    # and the system base memory bumped by 1072MB.
+    #
+    gArmTokenSpaceGuid.PcdSystemMemoryBase|0x10043000000
+  !else
+    gArmTokenSpaceGuid.PcdSystemMemoryBase|0x10000000000
+  !endif
 
   # Space for 32 stacks
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x1000007c000
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|gArmTokenSpaceGuid.PcdSystemMemoryBase + 0x7c000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -496,10 +494,6 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
-  # Core and Cluster Count
-  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdCoreCount|1
-  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdClusterCount|1
-
   # System Memory Size -- 128 MB initially, actual size will be fetched from DT
   # TODO as no DT will be used we should pass this by some other method
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x08000000
@@ -527,7 +521,7 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   #
   # SMBIOS entry point version
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0304
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0307
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
 
   gArmTokenSpaceGuid.PcdSystemBiosRelease|0x0100
@@ -595,7 +589,7 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
     <LibraryClasses>
@@ -655,11 +649,17 @@ DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   Silicon/Qemu/SbsaQemu/Drivers/SbsaQemuHighMemDxe/SbsaQemuHighMemDxe.inf
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf {
+    <LibraryClasses>
+      RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+      ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
+      ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
+  }
 
   #
   # FAT filesystem + GPT/MBR partitioning

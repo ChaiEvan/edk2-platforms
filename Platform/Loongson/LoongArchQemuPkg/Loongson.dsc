@@ -100,9 +100,6 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 !endif
 
-  # For stack protector support
-  NULL                             | MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
   BaseLib                          | MdePkg/Library/BaseLib/BaseLib.inf
   SafeIntLib                       | MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   TimeBaseLib                      | EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
@@ -128,7 +125,6 @@
   IoLib                            | MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   PlatformHookLib                  | Platform/Loongson/LoongArchQemuPkg/Library/Fdt16550SerialPortHookLib/Fdt16550SerialPortHookLib.inf
   SerialPortLib                    | MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
-  EfiResetSystemLib                | Platform/Loongson/LoongArchQemuPkg/Library/ResetSystemAcpiLib/BaseResetSystemAcpiGedLib.inf
   ResetSystemLib                   | Platform/Loongson/LoongArchQemuPkg/Library/ResetSystemAcpiLib/BaseResetSystemAcpiGedLib.inf
 
   UefiLib                          | MdePkg/Library/UefiLib/UefiLib.inf
@@ -242,7 +238,6 @@
   RealTimeClockLib                 | Platform/Loongson/LoongArchQemuPkg/Library/LsRealTimeClockLib/LsRealTimeClockLib.inf
   VariablePolicyLib                | MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
   QemuFwCfgLib                     | Platform/Loongson/LoongArchQemuPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
-  EfiResetSystemLib                | Platform/Loongson/LoongArchQemuPkg/Library/ResetSystemAcpiLib/DxeResetSystemAcpiGedLib.inf
   ResetSystemLib                   | Platform/Loongson/LoongArchQemuPkg/Library/ResetSystemAcpiLib/DxeResetSystemAcpiGedLib.inf
   PciExpressLib                    | MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
 !if $(TARGET) != RELEASE

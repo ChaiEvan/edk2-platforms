@@ -3,7 +3,7 @@
 #
 #  Description file for AMD AmdMinBoardPkg
 #
-#  Copyright (c) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.
+#  Copyright (c) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -13,8 +13,8 @@
   PLATFORM_NAME               = AmdMinBoardPkg
   PLATFORM_VERSION            = 0.1
   OUTPUT_DIRECTORY            = Build/$(PLATFORM_NAME)
-  BUILD_TARGETS               = DEBUG | RELEASE | NOOPT
-  SUPPORTED_ARCHITECTURES     = IA32 | X64
+  BUILD_TARGETS               = DEBUG|RELEASE|NOOPT
+  SUPPORTED_ARCHITECTURES     = IA32|X64
 
 [Packages]
   AmdMinBoardPkg/AmdMinBoardPkg.dec
@@ -36,12 +36,13 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
 
 [LibraryClasses.common.SEC]
   PlatformSecLib|AmdMinBoardPkg/Library/PlatformSecLib/PlatformSecLib.inf
-
+  
 [LibraryClasses.common.PEIM]
   BoardInitLib|AmdMinBoardPkg/Library/PeiBoardInitPreMemLib/PeiBoardInitPreMemLib.inf
   SetCacheMtrrLib|AmdMinBoardPkg/Library/SetCacheMtrrLib/SetCacheMtrrLib.inf

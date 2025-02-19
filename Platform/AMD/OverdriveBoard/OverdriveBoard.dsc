@@ -80,10 +80,6 @@ DEFINE X64EMU_ENABLE  = FALSE
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
-  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
-  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
-  ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
-  ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
@@ -110,7 +106,8 @@ DEFINE X64EMU_ENABLE  = FALSE
   # Styx specific libraries
   #
   AmdSataInit|Silicon/AMD/Styx/AmdModulePkg/Library/AmdSataInitLib/AmdSataInitLib.inf
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
+  ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   RealTimeClockLib|Silicon/AMD/Styx/Library/RealTimeClockLib/RealTimeClockLib.inf
   TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
 
@@ -169,8 +166,6 @@ DEFINE X64EMU_ENABLE  = FALSE
   ArmPlatformLib|Silicon/AMD/Styx/Library/AmdStyxLib/AmdStyxLibSec.inf
 
   DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
-
-  ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
 
 [LibraryClasses.common.PEIM, LibraryClasses.common.SEC]
   MemoryInitPeiLib|Silicon/AMD/Styx/Library/MemoryInitPei/MemoryInitPeiLib.inf
@@ -232,18 +227,6 @@ DEFINE X64EMU_ENABLE  = FALSE
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
 
-[LibraryClasses.ARM]
-  #
-  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
-  # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-[LibraryClasses.AARCH64]
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
 ###################################################################################################
 # BuildOptions Section - Define the module specific tool chain flags that should be used as
 #                        the default flags for a module. These flags are appended to any
@@ -266,9 +249,6 @@ DEFINE X64EMU_ENABLE  = FALSE
 ################################################################################
 
 [PcdsFeatureFlag.common]
-  # Use the Vector Table location in CpuDxe. We will not copy the Vector Table at PcdCpuVectorBaseAddress
-  gArmTokenSpaceGuid.PcdRelocateVectorTable|FALSE
-
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
@@ -353,10 +333,8 @@ DEFINE X64EMU_ENABLE  = FALSE
   # Number of configured cores
   gArmPlatformTokenSpaceGuid.PcdCoreCount|$(NUM_CORES)
 
-  # Stacks for MPCores in Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x8001680000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x10000
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x800
 
   # Declare system memory base
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x8000000000
@@ -505,7 +483,7 @@ DEFINE X64EMU_ENABLE  = FALSE
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
     <LibraryClasses>
@@ -570,7 +548,7 @@ DEFINE X64EMU_ENABLE  = FALSE
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
   #

@@ -23,7 +23,9 @@
   DEFINE CPPC_EN                            = FALSE
 
 [BuildOptions]
-  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+  # EDK2_PLAT_FW_REL_VERSION macro resolve to value like RD-INFRA-2024.09.30.
+  # This value is set in build-uefi.sh
+  *_*_*_CC_FLAGS = -DDISABLE_NEW_DEPRECATED_INTERFACES -DEDK2_PLAT_FW_REL_VERSION=\"$(EDK2_PLAT_FW_REL_VERSION)\"
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -39,7 +41,8 @@
   # NOR flash identification support
   NorFlashInfoLib|EmbeddedPkg/Library/NorFlashInfoLib/NorFlashInfoLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
+  ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
@@ -133,10 +136,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x01400000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x01400000
 
-  # Stacks for MPCores in Normal World
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x80000000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x40000
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x0
 
   # ACPI Table Version
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20
@@ -220,7 +221,7 @@
   #
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
@@ -249,7 +250,7 @@
   # Architectural Protocols
   #
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
   ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
 !if $(ENABLE_GOP) == TRUE

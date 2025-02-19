@@ -3,7 +3,7 @@
 # This is the package provides the AMD edk2 common platform drivers
 # and libraries for AMD Server, Client and Gaming console platforms.
 #
-# Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -36,13 +36,16 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PciSegmentInfoLib|MdePkg/Library/BasePciSegmentInfoLibNull/BasePciSegmentInfoLibNull.inf
   PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
   SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
@@ -64,6 +67,7 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   PlatformSocLib|AmdPlatformPkg/Library/DxePlatformSocLib/DxePlatformSocLibNull.inf
   SpiHcPlatformLib|AmdPlatformPkg/Universal/Spi/SpiFvb/SpiFvbDxe.inf
+  TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
 [LibraryClasses.common.SMM_CORE]
   SmmCoreAmdSpiHcHookLib|AmdPlatformPkg/Library/SmmCoreAmdSpiHcHookLib/SmmCoreAmdSpiHcHookLib.inf
@@ -75,6 +79,11 @@
   SpiHcPlatformLib|AmdPlatformPkg/Library/SpiHcPlatformLib/SpiHcPlatformLibSmm.inf
 
 [Components]
+  AmdPlatformPkg/DynamicTables/ConfigurationManagerDxe/ConfigurationManagerDxe.inf
+  AmdPlatformPkg/DynamicTables/Library/Acpi/AcpiFacsLib/AcpiFacsLib.inf
+  AmdPlatformPkg/DynamicTables/Library/Acpi/AcpiSsdtCpuTopologyLib/AcpiSsdtCpuTopologyLib.inf
+  AmdPlatformPkg/DynamicTables/Library/Acpi/AcpiSsdtPciLib/AcpiSsdtPciLib.inf
+  AmdPlatformPkg/DynamicTables/Library/SampleCmPlatOverrideLib/SamplecmPlatOverrideLib.inf
   AmdPlatformPkg/Library/BaseAlwaysFalseDepexLib/BaseAlwaysFalseDepexLib.inf
   AmdPlatformPkg/Library/DxePlatformSocLib/DxePlatformSocLibNull.inf
   AmdPlatformPkg/Library/SimulatorSerialPortLibPort80/SimulatorSerialPortLibPort80.inf
@@ -82,7 +91,6 @@
   AmdPlatformPkg/Library/SmmCorePlatformHookLib/SmmCorePlatformHookLib.inf
   AmdPlatformPkg/Library/SpiHcPlatformLib/SpiHcPlatformLibDxe.inf
   AmdPlatformPkg/Library/SpiHcPlatformLib/SpiHcPlatformLibSmm.inf
-  AmdPlatformPkg/Universal/Acpi/AcpiCommon/AcpiCommon.inf
   AmdPlatformPkg/Universal/HiiConfigRouting/AmdConfigRouting.inf
   AmdPlatformPkg/Universal/LogoDxe/JpegLogoDxe.inf                                           # Server platform JPEG logo driver
   AmdPlatformPkg/Universal/LogoDxe/LogoDxe.inf                                               # Server platfrom Bitmap logo driver

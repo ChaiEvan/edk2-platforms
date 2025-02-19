@@ -113,7 +113,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
-  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  INF ArmPkg/Drivers/ArmGicDxe/ArmGicV2Dxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
   #
@@ -238,7 +238,7 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  INF ArmPlatformPkg/Sec/Sec.inf
   INF MdeModulePkg/Core/Pei/PeiMain.inf
   INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   INF Silicon/AMD/Styx/AmdModulePkg/Iscp/IscpPei.inf
